@@ -1,17 +1,17 @@
 import { log } from "./utils";
+
 import * as modules from "./modules";
 import * as components from "./components";
 
+const PREFIX = 'kelly'
+
 const defaultOptions = {
-  prefix: null,
   confidenceThreshold: 0.6,
 };
 
-const config = { ...defaultOptions };
-
 export const KellyIO = {
   install(app, options) {
-    const { prefix, confidenceThreshold } = Object.assign(
+    const { confidenceThreshold } = Object.assign(
       defaultOptions,
       options
     );
@@ -20,16 +20,13 @@ export const KellyIO = {
     if (!store) throw new Error("Please, instantiate Vue.use(store) first");
 
     log("Registering modules into store");
-    if (typeof prefix === "string") log(`Using prefix [${prefix}]`);
 
     Object.entries(modules).forEach(([name, module]) => {
-      if (typeof prefix === "string") name = prefix + "/" + name;
-      store.registerModule(name, module);
+      store.registerModule(PREFIX + '/' + name, module);
     });
-    config.prefix = prefix;
 
     log(`Setting confidence threshold to [${confidenceThreshold}]`);
-    store.dispatch("kelly/ears/setConfidenceThreshold", {
+    store.dispatch(`${PREFIX}/ears/setConfidenceThreshold`, {
       confidenceThreshold,
     });
 
@@ -38,9 +35,9 @@ export const KellyIO = {
       app.component(name, component);
     });
 
-    log(`Attacching [$kelly] to Vue instance`);
+    log(`Attacching [$${PREFIX}] to Vue instance`);
     app.config.globalProperties.$kelly = {
-      prefix,
+      prefix: PREFIX,
     };
 
     log("Setup completed");
@@ -48,18 +45,16 @@ export const KellyIO = {
 };
 
 export function useKelly(store, { setup = false }) {
-  if (setup) store.dispatch("kelly/ears/setup");
-
-  const { prefix } = config;
+  if (setup) store.dispatch(`${PREFIX}/ears/setup`);
 
   return {
     Kgetters: new Proxy(store.getters, {
       get(target, prop) {
-        return target[`${prefix}/${prop}`];
+        return target[`${PREFIX}/${prop}`];
       },
     }),
     Kdispatch: function (type, payload, options) {
-      store.dispatch(`${prefix}/${type}`, payload, options);
+      store.dispatch(`${PREFIX}/${type}`, payload, options);
     },
   };
 }
