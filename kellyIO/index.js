@@ -1,3 +1,4 @@
+import { log } from "./utils";
 import * as modules from "./modules";
 import * as components from "./components";
 
@@ -34,8 +35,8 @@ export const KellyIO = {
 
     log(`Registering components into app`);
     Object.entries(components).forEach(([name, component]) => {
-      app.component(name, component)
-    })
+      app.component(name, component);
+    });
 
     log(`Attacching [$kelly] to Vue instance`);
     app.config.globalProperties.$kelly = {
@@ -61,8 +62,4 @@ export function useKelly(store, { setup = false }) {
       store.dispatch(`${prefix}/${type}`, payload, options);
     },
   };
-}
-
-function log(...args) {
-  console.info("[KellyIO] - ", ...args);
 }
