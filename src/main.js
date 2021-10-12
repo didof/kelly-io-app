@@ -1,5 +1,18 @@
 import { createApp } from "vue";
 import App from "./App.vue";
-import "./registerServiceWorker";
+import { store } from "./store";
+import { router } from "./router";
+import { KellyIO } from "../kellyIO";
+// import "./registerServiceWorker";
 
-createApp(App).mount("#app");
+const app = createApp(App);
+
+app.use(store);
+
+app.use(router);
+
+app.use(KellyIO, {
+    prefix: 'kelly'
+});
+
+app.mount("#app");

@@ -1,26 +1,91 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png" />
-  <HelloWorld msg="Welcome to Your Vue.js App" />
+  <nav>
+    <ul>
+      <li><router-link to="/">Go to Home</router-link></li>
+      <li><router-link to="/morsecode">Go to Morsecode</router-link></li>
+    </ul>
+  </nav>
+
+  <main>
+    <pre>lastTranscript: {{ lastTranscript }}</pre>
+
+    <button @click="handle_start" :disabled="isStartDisabled">start</button>
+    <button @click="handle_stop" :disabled="isStopDisabled">stop</button>
+  </main>
+
+  <router-view></router-view>
+
+  <SpeechConfirmationModal />
 </template>
 
 <script>
-import HelloWorld from "./components/HelloWorld.vue";
+import { defineComponent, computed } from "vue";
+import { useStore } from "vuex";
 
-export default {
-  name: "App",
+import SpeechConfirmationModal from "./components/modal/SpeechConfirmationModal";
+
+export default defineComponent({
+  name: "app",
   components: {
-    HelloWorld,
+    SpeechConfirmationModal,
   },
-};
+  setup() {
+    const store = useStore();
+    store.dispatch("kelly/speechRecognition/init");
+
+    const isStartDisabled = computed(() => !store.getters["kelly/system/isIdle"]);
+    const isStopDisabled = computed(() => !store.getters["kelly/system/isRecording"]);
+    const lastTranscript = computed(
+      () => store.getters["kelly/speechRecognition/lastTranscript"]
+    );
+
+    return {
+      isStartDisabled,
+      isStopDisabled,
+      lastTranscript,
+      handle_start,
+      handle_stop,
+    };
+
+    function handle_start() {
+      store.dispatch("kelly/speechRecognition/startRecognition");
+    }
+
+    function handle_stop() {
+      store.dispatch("kelly/speechRecognition/stopRecognition");
+    }
+  },
+});
 </script>
 
 <style>
+body {
+  margin: 0;
+}
+
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Press Start 2P", cursive;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+
+  width: 100vw;
+  height: 100vh;
+
+  overflow: hidden;
+}
+
+ul {
+  list-style: none;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 </style>
