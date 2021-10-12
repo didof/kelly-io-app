@@ -15,33 +15,24 @@
 
   <router-view></router-view>
 
-  <SpeechConfirmationModal />
+  <KellySpeechConfirmationModal />
 </template>
 
 <script>
 import { defineComponent, computed } from "vue";
 import { useStore } from "vuex";
-
-import SpeechConfirmationModal from "./components/modal/SpeechConfirmationModal";
+import { useKelly } from "../kellyIO";
 
 export default defineComponent({
   name: "app",
-  components: {
-    SpeechConfirmationModal,
-  },
   setup() {
     const store = useStore();
-    store.dispatch("kelly/ears/init");
 
-    const isStartDisabled = computed(
-      () => !store.getters["kelly/system/isIdle"]
-    );
-    const isStopDisabled = computed(
-      () => !store.getters["kelly/system/isRecording"]
-    );
-    const lastTranscript = computed(
-      () => store.getters["kelly/ears/lastTranscript"]
-    );
+    const { Kgetters, Kdispatch } = useKelly(store, { setup: true });
+
+    const isStartDisabled = computed(() => !Kgetters["system/isIdle"]);
+    const isStopDisabled = computed(() => !Kgetters["system/isRecording"]);
+    const lastTranscript = computed(() => Kgetters["ears/lastTranscript"]);
 
     return {
       isStartDisabled,
@@ -52,11 +43,11 @@ export default defineComponent({
     };
 
     function handle_start() {
-      store.dispatch("kelly/ears/startRecognition");
+      Kdispatch("ears/startRecognition");
     }
 
     function handle_stop() {
-      store.dispatch("kelly/ears/stopRecognition");
+      Kdispatch("ears/stopRecognition");
     }
   },
 });

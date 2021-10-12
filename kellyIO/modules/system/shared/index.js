@@ -1,9 +1,10 @@
 export const STATUS = {
-  IDLE: 0,
-  RECORDING: 1,
-  SPEAKING: 2,
+  OFF: 0,
+  IDLE: 1,
+  RECORDING: 2,
+  SPEAKING: 3,
 };
-export const INITIAL_STATUS = STATUS.IDLE;
+export const INITIAL_STATUS = STATUS.OFF;
 
 // import LANGS from './LANGS.json'
 

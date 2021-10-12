@@ -20,11 +20,12 @@
 </template>
 
 <script>
+// TODO use slots to make it composable
 import { defineComponent, computed } from "vue";
 import { useStore } from "vuex";
 
 export default defineComponent({
-  name: "speech-confirmation-modal",
+  name: "kelly-speech-confirmation-modal",
   setup() {
     const store = useStore();
 

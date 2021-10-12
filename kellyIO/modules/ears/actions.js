@@ -1,4 +1,4 @@
-export function init({ commit, dispatch, getters }) {
+export function setup({ commit, dispatch, getters }) {
   commit("createInstance");
 
   commit("setConfigContinuous", { continuos: false });
@@ -13,8 +13,6 @@ export function init({ commit, dispatch, getters }) {
     const { transcript, confidence } = event.results[0][0];
 
     dispatch("kelly/brain/setInput", { transcript }, { root: true });
-
-    console.log(getters.confidenceThreshold)
 
     if (confidence < getters.confidenceThreshold) {
       dispatch(
@@ -57,6 +55,8 @@ export function init({ commit, dispatch, getters }) {
     commit("stopRecognition");
     dispatch("kelly/system/setIdleStatus", undefined, { root: true });
   });
+
+  dispatch("kelly/system/setIdleStatus", undefined, { root: true });
 }
 
 export function setConfidenceThreshold({ commit }, payload) {
