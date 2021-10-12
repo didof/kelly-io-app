@@ -42,6 +42,10 @@ export function setConfigOnNoMatch(state, cb) {
   state.recognition.onnomatch = cb;
 }
 
+export function setConfidenceThreshold(state, { confidenceThreshold }) {
+  state.confidenceThreshold = confidenceThreshold
+}
+
 export function setConfigOnError(state, cb) {
   state.recognition.onerror = cb;
 }

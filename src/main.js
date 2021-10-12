@@ -12,7 +12,8 @@ app.use(store);
 app.use(router);
 
 app.use(KellyIO, {
-    prefix: 'kelly'
+    prefix: 'kelly',
+    confidenceThreshold: 0.5
 });
 
 app.mount("#app");

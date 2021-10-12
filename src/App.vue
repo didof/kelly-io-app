@@ -31,12 +31,16 @@ export default defineComponent({
   },
   setup() {
     const store = useStore();
-    store.dispatch("kelly/speechRecognition/init");
+    store.dispatch("kelly/ears/init");
 
-    const isStartDisabled = computed(() => !store.getters["kelly/system/isIdle"]);
-    const isStopDisabled = computed(() => !store.getters["kelly/system/isRecording"]);
+    const isStartDisabled = computed(
+      () => !store.getters["kelly/system/isIdle"]
+    );
+    const isStopDisabled = computed(
+      () => !store.getters["kelly/system/isRecording"]
+    );
     const lastTranscript = computed(
-      () => store.getters["kelly/speechRecognition/lastTranscript"]
+      () => store.getters["kelly/ears/lastTranscript"]
     );
 
     return {
@@ -48,11 +52,11 @@ export default defineComponent({
     };
 
     function handle_start() {
-      store.dispatch("kelly/speechRecognition/startRecognition");
+      store.dispatch("kelly/ears/startRecognition");
     }
 
     function handle_stop() {
-      store.dispatch("kelly/speechRecognition/stopRecognition");
+      store.dispatch("kelly/ears/stopRecognition");
     }
   },
 });

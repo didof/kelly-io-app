@@ -1,6 +1,4 @@
-const CONFIDENCE_THRESHOLD = 0.9;
-
-export function init({ commit, dispatch }) {
+export function init({ commit, dispatch, getters }) {
   commit("createInstance");
 
   commit("setConfigContinuous", { continuos: false });
@@ -15,10 +13,15 @@ export function init({ commit, dispatch }) {
     const { transcript, confidence } = event.results[0][0];
 
     dispatch("kelly/brain/setInput", { transcript }, { root: true });
-    // TODO delete if no
 
-    if (confidence < CONFIDENCE_THRESHOLD) {
-      dispatch("kelly/brain/askTranscriptConfirmation", { transcript }, { root: true });
+    console.log(getters.confidenceThreshold)
+
+    if (confidence < getters.confidenceThreshold) {
+      dispatch(
+        "kelly/brain/askTranscriptConfirmation",
+        { transcript },
+        { root: true }
+      );
     } else {
       commit("addTranscript", { transcript });
       dispatch("kelly/brain/interpret", undefined, { root: true });
@@ -56,12 +59,16 @@ export function init({ commit, dispatch }) {
   });
 }
 
+export function setConfidenceThreshold({ commit }, payload) {
+  commit("setConfidenceThreshold", payload);
+}
+
 // TODO replicate for setConfigGrammar, setConfigLang
 export function setConfigContinuous({ commit, getters }, payload) {
   if (getters.hasBeenInitializated) commit("setConfigContinuous", payload);
   else
     console.warn(
-      `[kelly/speechRecognition/setConfigContinuos] has been called before <recognition> initialization.`
+      `[kelly/ears/setConfigContinuos] has been called before <recognition> initialization.`
     );
 }
 
