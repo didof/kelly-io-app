@@ -49,7 +49,7 @@ export function setup({ commit, dispatch, getters }) {
     console.info("onerror", event);
 
     if (event.error === "no-speech") {
-      console.log("TODO: Please, give me a command");
+      console.log("Please, give me a command");
     }
 
     commit("stopRecognition");

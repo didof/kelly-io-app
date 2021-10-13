@@ -3,18 +3,21 @@ import { log } from "./utils";
 import * as modules from "./modules";
 import * as components from "./components";
 
-const PREFIX = 'kelly'
+const PREFIX = "kelly";
 
 const defaultOptions = {
   confidenceThreshold: 0.6,
+  skills: [],
 };
 
 export const KellyIO = {
   install(app, options) {
-    const { confidenceThreshold } = Object.assign(
+    const { confidenceThreshold, skills } = Object.assign(
       defaultOptions,
       options
     );
+
+    console.log(skills);
 
     const store = app.config.globalProperties.$store;
     if (!store) throw new Error("Please, instantiate Vue.use(store) first");
@@ -22,7 +25,7 @@ export const KellyIO = {
     log("Registering modules into store");
 
     Object.entries(modules).forEach(([name, module]) => {
-      store.registerModule(PREFIX + '/' + name, module);
+      store.registerModule(PREFIX + "/" + name, module);
     });
 
     log(`Setting confidence threshold to [${confidenceThreshold}]`);
@@ -43,6 +46,28 @@ export const KellyIO = {
     log("Setup completed");
   },
 };
+
+export function createKellyIOConfiguration({ confidenceThreshold, skills }) {
+  if (typeof confidenceThreshold !== "number")
+    crack("[confidenceThreshold] must be a number");
+  if (confidenceThreshold < 0 || confidenceThreshold > 1)
+    crack("[confidenceThreshold] must be a value between 0 and 1");
+  if (typeof skills !== "function") crack("[skills] must be a function");
+
+  const baseSkills = ["A"];
+
+  const mergedSkills = skills(baseSkills);
+
+  return {
+    confidenceThreshold,
+    skills: mergedSkills,
+  };
+
+  function crack(...args) {
+    log(...args);
+    throw new Error(...args);
+  }
+}
 
 export function useKelly(store, { setup = false }) {
   if (setup) store.dispatch(`${PREFIX}/ears/setup`);

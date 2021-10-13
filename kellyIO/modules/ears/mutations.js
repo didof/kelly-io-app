@@ -1,8 +1,7 @@
 export function createInstance(state) {
   const SpeechRecognition = SpeechRecognition || window.webkitSpeechRecognition;
   const recognition = new SpeechRecognition();
-
-  // TODO config
+  
   recognition.interimResults = false;
   recognition.maxAlternatives = 1;
 

@@ -8,7 +8,7 @@ export function askTranscriptConfirmation({ dispatch }, payload) {
 
 export function abort({ commit, dispatch }) {
   dispatch("kelly/modal/reset", undefined, { root: true });
-  commit("setInput", { input: "" });
+  commit("clearInput");
 }
 
 export function interpret({ commit, dispatch }) {
