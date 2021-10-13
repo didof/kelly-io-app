@@ -30,6 +30,9 @@ export default defineComponent({
 
     const { Kgetters, Kdispatch } = useKelly(store, { setup: true });
 
+    // mock
+    // Kdispatch("brain/interpret");
+
     const isStartDisabled = computed(() => !Kgetters["system/isIdle"]);
     const isStopDisabled = computed(() => !Kgetters["system/isRecording"]);
     const lastTranscript = computed(() => Kgetters["ears/lastTranscript"]);

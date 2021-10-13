@@ -9,3 +9,7 @@ export function setRecordingStatus({ commit }) {
 export function setSpeakingStatus({ commit }) {
   commit("setSpeakingStatus");
 }
+
+export function mockAction({ dispatch }, name) {
+  dispatch(name);
+}

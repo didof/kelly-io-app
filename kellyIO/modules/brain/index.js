@@ -6,8 +6,10 @@ export default {
   namespaced: true,
   state() {
     return {
+      skills: [],
       input: "",
       output: null,
+
     };
   },
   getters,

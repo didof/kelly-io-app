@@ -15,7 +15,7 @@ app.use(
   KellyIO,
   createKellyIOConfiguration({
     confidenceThreshold: 0.5,
-    skills: (baseSkills) => [...baseSkills, 'B']
+    skills: (baseSkills) => [...baseSkills]
   })
 );
 

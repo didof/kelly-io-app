@@ -3,11 +3,13 @@ import { log } from "./utils";
 import * as modules from "./modules";
 import * as components from "./components";
 
+import { RecognizeNameSkill } from "./skills";
+
 const PREFIX = "kelly";
 
 const defaultOptions = {
   confidenceThreshold: 0.6,
-  skills: [],
+  skills: [RecognizeNameSkill],
 };
 
 export const KellyIO = {
@@ -16,8 +18,6 @@ export const KellyIO = {
       defaultOptions,
       options
     );
-
-    console.log(skills);
 
     const store = app.config.globalProperties.$store;
     if (!store) throw new Error("Please, instantiate Vue.use(store) first");
@@ -33,9 +33,14 @@ export const KellyIO = {
       confidenceThreshold,
     });
 
-    log(`Registering components into app`);
+    log("Registering components into app");
     Object.entries(components).forEach(([name, component]) => {
       app.component(name, component);
+    });
+
+    log("Learning new skills");
+    skills.forEach((skill) => {
+      store.dispatch(`${PREFIX}/brain/learn`, { skill });
     });
 
     log(`Attacching [$${PREFIX}] to Vue instance`);
@@ -52,11 +57,11 @@ export function createKellyIOConfiguration({ confidenceThreshold, skills }) {
     crack("[confidenceThreshold] must be a number");
   if (confidenceThreshold < 0 || confidenceThreshold > 1)
     crack("[confidenceThreshold] must be a value between 0 and 1");
+
   if (typeof skills !== "function") crack("[skills] must be a function");
 
-  const baseSkills = ["A"];
-
-  const mergedSkills = skills(baseSkills);
+  // TODO check if all skills are constructors
+  const mergedSkills = skills(defaultOptions.skills);
 
   return {
     confidenceThreshold,
