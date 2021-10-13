@@ -3,13 +3,16 @@ import { log } from "./utils";
 import * as modules from "./modules";
 import * as components from "./components";
 
-import { RecognizeNameSkill } from "./skills";
+import { HelpSkill, ConfusionSkill } from "./skills";
 
 const PREFIX = "kelly";
 
 const defaultOptions = {
-  confidenceThreshold: 0.6,
-  skills: [RecognizeNameSkill],
+  confidenceThreshold: 0.5,
+  skills: [
+    new HelpSkill(),
+    new ConfusionSkill()
+  ],
 };
 
 export const KellyIO = {
@@ -29,7 +32,7 @@ export const KellyIO = {
     });
 
     log(`Setting confidence threshold to [${confidenceThreshold}]`);
-    store.dispatch(`${PREFIX}/ears/setConfidenceThreshold`, {
+    store.dispatch(`${PREFIX}/brain/setConfidenceThreshold`, {
       confidenceThreshold,
     });
 
@@ -52,30 +55,11 @@ export const KellyIO = {
   },
 };
 
-export function createKellyIOConfiguration({ confidenceThreshold, skills }) {
-  if (typeof confidenceThreshold !== "number")
-    crack("[confidenceThreshold] must be a number");
-  if (confidenceThreshold < 0 || confidenceThreshold > 1)
-    crack("[confidenceThreshold] must be a value between 0 and 1");
-
-  if (typeof skills !== "function") crack("[skills] must be a function");
-
-  // TODO check if all skills are constructors
-  const mergedSkills = skills(defaultOptions.skills);
-
-  return {
-    confidenceThreshold,
-    skills: mergedSkills,
-  };
-
-  function crack(...args) {
-    log(...args);
-    throw new Error(...args);
-  }
-}
-
 export function useKelly(store, { setup = false }) {
-  if (setup) store.dispatch(`${PREFIX}/ears/setup`);
+  if (setup) {
+    store.dispatch(`${PREFIX}/ears/setup`);
+    store.dispatch(`${PREFIX}/mouth/setup`);
+  }
 
   return {
     Kgetters: new Proxy(store.getters, {

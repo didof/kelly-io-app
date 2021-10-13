@@ -1,25 +1,42 @@
-export function setInput(state, { input }) {
-  state.input = input;
+/**
+ * Config
+ */
+
+export function learn(state, { skill }) {
+  state.skills.push(skill);
 }
 
-export function clearInput(state) {
-  state.input = "";
+export const setConfidenceThreshold = (state, { confidenceThreshold }) => {
+  state.confidenceThreshold = confidenceThreshold;
+};
+
+/**
+ * Input
+ */
+
+export function setActiveSkill(state, { activeSkill }) {
+  state.activeSkill = activeSkill;
 }
 
-export function learn(state, { skillInstance }) {
-  state.skills.push(skillInstance);
+export function addLine(state, { line }) {
+  state.queue.push(line);
 }
 
-export function interpret(state, output) {
-  if (state.input === "") {
-    console.warn(
-      "[KellyIO]",
-      "[brain/mutations/interpret] has been called, but input is empty string. This is not supposed to happen."
-    );
-    return;
-  }
+export function amendLastLine(state) {
+  state.queue.splice(state.queue.length - 2, 1);
+}
 
-  state.output = { output };
+export function clearQueue(state) {
+  state.queue = [];
+  state.index = 0
+}
 
-  // TODO logic
+export function nextLine(state) {
+  state.index += 1;
+}
+
+export function reset(state) {
+  state.activeSkill = null
+  state.queue = [];
+  state.index = 0
 }

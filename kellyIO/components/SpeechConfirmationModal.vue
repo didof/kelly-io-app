@@ -49,7 +49,7 @@ export default defineComponent({
     }
 
     function handle_process() {
-      store.dispatch("kelly/brain/interpret");
+      store.dispatch("kelly/brain/confirm");
     }
   },
 });

@@ -6,9 +6,9 @@
     </ul>
   </nav>
 
-  <main>
-    <pre>lastTranscript: {{ lastTranscript }}</pre>
+  <pre>{{ queue }}</pre>
 
+  <main>
     <button @click="handle_start" :disabled="isStartDisabled">start</button>
     <button @click="handle_stop" :disabled="isStopDisabled">stop</button>
   </main>
@@ -30,17 +30,14 @@ export default defineComponent({
 
     const { Kgetters, Kdispatch } = useKelly(store, { setup: true });
 
-    // mock
-    // Kdispatch("brain/interpret");
-
     const isStartDisabled = computed(() => !Kgetters["system/isIdle"]);
     const isStopDisabled = computed(() => !Kgetters["system/isRecording"]);
-    const lastTranscript = computed(() => Kgetters["ears/lastTranscript"]);
+    const queue = computed(() => Kgetters["brain/queue"]);
 
     return {
       isStartDisabled,
       isStopDisabled,
-      lastTranscript,
+      queue,
       handle_start,
       handle_stop,
     };
