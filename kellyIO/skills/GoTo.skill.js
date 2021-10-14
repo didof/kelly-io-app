@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 import createPlugin from "./utils";
 
 export default createPlugin({

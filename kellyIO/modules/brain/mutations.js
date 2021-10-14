@@ -47,7 +47,6 @@ export function setScript(state, { name, script }) {
 }
 
 export function setDependency(state, { dependencyName, dependency }) {
-  console.log(dependency)
   state.dependencies.set(dependencyName, () => dependency);
 }
 

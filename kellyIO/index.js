@@ -5,6 +5,8 @@ import * as components from "./components";
 
 import { HelpSkill, ConfusionSkill, GoToSkill } from "./skills";
 
+import { defineKRecorder } from "./components";
+
 const TAIL_SKILLS = [HelpSkill, ConfusionSkill];
 
 const defaultOptions = {
@@ -65,8 +67,11 @@ export default {
   },
 };
 
-export function useKelly(store, { setup = false }) {
-  if (setup) {
+const defaultUseKellyOptions = { setup: false };
+export function useKelly(store, options = defaultUseKellyOptions) {
+  options = Object.assign(defaultUseKellyOptions, options);
+
+  if (options.setup) {
     store.dispatch(`kelly/ears/setup`);
     store.dispatch(`kelly/mouth/setup`);
   }
@@ -84,3 +89,4 @@ export function useKelly(store, { setup = false }) {
 }
 
 export { GoToSkill };
+export { defineKRecorder };

@@ -9,12 +9,9 @@
   <pre>{{ activeSkill }}</pre>
   <pre>{{ queue }}</pre>
 
-  <main>
-    <button @click="handle_start" :disabled="isStartDisabled">start</button>
-    <button @click="handle_stop" :disabled="isStopDisabled">stop</button>
-  </main>
-
   <router-view></router-view>
+
+  <ClickRecorder />
 
   <KellySpeechConfirmationModal />
 </template>
@@ -24,34 +21,25 @@ import { defineComponent, computed } from "vue";
 import { useStore } from "vuex";
 import { useKelly } from "../kellyIO";
 
+import ClickRecorder from "./components/ClickRecorder.vue";
+
 export default defineComponent({
   name: "app",
+  components: {
+    ClickRecorder,
+  },
   setup() {
     const store = useStore();
 
-    const { Kgetters, Kdispatch } = useKelly(store, { setup: true });
+    const { Kgetters } = useKelly(store, { setup: true });
 
-    const isStartDisabled = computed(() => !Kgetters["system/isIdle"]);
-    const isStopDisabled = computed(() => !Kgetters["system/isRecording"]);
     const queue = computed(() => Kgetters["brain/queue"]);
     const activeSkill = computed(() => Kgetters["brain/activeSkill"]);
 
     return {
-      isStartDisabled,
-      isStopDisabled,
       queue,
       activeSkill,
-      handle_start,
-      handle_stop,
     };
-
-    function handle_start() {
-      Kdispatch("ears/startRecognition");
-    }
-
-    function handle_stop() {
-      Kdispatch("ears/stopRecognition");
-    }
   },
 });
 </script>
@@ -77,13 +65,6 @@ ul {
   list-style: none;
   display: flex;
   justify-content: space-around;
-  align-items: center;
-}
-
-main {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
   align-items: center;
 }
 </style>
