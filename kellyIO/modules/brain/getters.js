@@ -18,3 +18,8 @@ export const commands = ({ commands }) => commands;
 export const helps = ({ helps }) => helps;
 export const execs = ({ execs }) => execs;
 export const scripts = ({ scripts }) => scripts;
+export const dependencies = ({ dependencies }) => dependencies;
+export const dependency =
+  ({ dependencies }) =>
+  (name) =>
+    dependencies.get(name)();

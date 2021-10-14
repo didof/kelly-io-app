@@ -10,16 +10,10 @@ export default createPlugin({
       createLine: (context) => {
         const skillsNameList =
           context.rootGetters["kelly/brain/skillsNameList"].join(". ");
-        const skillsAmount = skillsNameList.length;
 
         return `
           I know several skills.
           Here a list of some. ${skillsNameList}.
-          ${
-            skillsAmount > 2
-              ? `${skillsAmount} skills, not bad, in my humble opinion. `
-              : ""
-          }
           Which one would you like me to explain?
         `;
       },
@@ -35,10 +29,14 @@ export default createPlugin({
             You asked for ${trigger} skill explanation. ${help}
           `;
       },
+      createRecover: (context, input) => {
+        const skillsNameList =
+          context.rootGetters["kelly/brain/skillsNameList"].join(". ");
+
+        return `
+          Sorry, I could not understand: ${input}. Please, say one of the following: ${skillsNameList}
+        `;
+      },
     },
   ],
-  exec: (context, line) => {
-    context.dispatch("kelly/mouth/setLine", { line }, { root: true });
-    context.dispatch("kelly/mouth/speak", undefined, { root: true });
-  },
 });

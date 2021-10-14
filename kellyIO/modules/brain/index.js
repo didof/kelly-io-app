@@ -12,7 +12,7 @@ export default {
       commands: new Map(),
       helps: new Map(),
       scripts: new Map(),
-      execs: new Map(),
+      dependencies: new Map(),
 
       engagedWith: null,
       index: 0,

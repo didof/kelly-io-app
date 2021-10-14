@@ -3,8 +3,12 @@ import Homepage from "./pages/Homepage";
 import Morsecode from "./pages/Morsecode";
 
 const routes = [
-  { path: "/", component: Homepage },
-  { path: "/morsecode", component: Morsecode },
+  { path: "/", name: "home", component: Homepage },
+  {
+    path: "/morse",
+    name: "morse",
+    component: Morsecode,
+  },
 ];
 
 export const router = createRouter({

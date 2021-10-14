@@ -3,16 +3,16 @@ import { log } from "./utils";
 import * as modules from "./modules";
 import * as components from "./components";
 
-import { HelpSkill, ConfusionSkill } from "./skills";
+import { HelpSkill, ConfusionSkill, GoToSkill } from "./skills";
 
-const DEFAULT_SKILLS = [HelpSkill, ConfusionSkill];
+const TAIL_SKILLS = [HelpSkill, ConfusionSkill];
 
 const defaultOptions = {
   confidenceThreshold: 0.5,
-  skills: () => DEFAULT_SKILLS,
+  skills: [],
 };
 
-export const KellyIO = {
+export default {
   install(app, options) {
     const { confidenceThreshold, skills } = Object.assign(
       defaultOptions,
@@ -39,16 +39,29 @@ export const KellyIO = {
     });
 
     log("Learning new skills");
-    skills(DEFAULT_SKILLS).forEach((plugin) => {
-      plugin.install(store);
-    });
+    const installPlugin = createPluginInstaller(app);
+    skills.forEach(installPlugin);
+    TAIL_SKILLS.forEach(installPlugin);
 
     log("Attacching [$kelly] to Vue instance");
-    app.config.globalProperties.$kelly = {
-      prefix: "kelly",
-    };
+    attachToGlobal();
 
     log("Setup completed");
+
+    function createPluginInstaller(app) {
+      const store = app.config.globalProperties.$store;
+      return function installPlugin(plugin) {
+        plugin.install(store);
+        plugin.saveDependencies(app);
+      };
+    }
+
+    function attachToGlobal(options) {
+      app.config.globalProperties.$kelly = {
+        prefix: "kelly",
+        ...options,
+      };
+    }
   },
 };
 
@@ -69,3 +82,5 @@ export function useKelly(store, { setup = false }) {
     },
   };
 }
+
+export { GoToSkill };

@@ -11,8 +11,4 @@ export default createPlugin({
         `Sorry, I could not understand the phrase: ${input}. Try to repeat it or ask for help.`,
     },
   ],
-  exec(context, line) {
-    context.dispatch("kelly/mouth/setLine", { line }, { root: true });
-    context.dispatch("kelly/mouth/speak", undefined, { root: true });
-  },
 });

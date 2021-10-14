@@ -14,7 +14,7 @@
     <button @click="handle_stop" :disabled="isStopDisabled">stop</button>
   </main>
 
-  <!-- <router-view></router-view> -->
+  <router-view></router-view>
 
   <KellySpeechConfirmationModal />
 </template>

@@ -8,7 +8,7 @@ export function setConfidenceThreshold({ commit }, payload) {
 }
 
 export function learn(context, payload) {
-  const { name, exec, script } = payload;
+  const { name, script } = payload;
 
   const commands = payload.commands(context);
   context.commit("setCommand", { name, commands });
@@ -16,9 +16,13 @@ export function learn(context, payload) {
   const help = payload.help(context);
   context.commit("setHelp", { name, help });
 
-  context.commit("setExec", { name, exec });
+  context.commit("setScript", { name, script });
+}
 
-  context.commit("setScripts", { name, script });
+export function setDependency(context, { dependencyName, dependency }) {
+  if (context.getters.dependencies.has(dependencyName)) return;
+
+  context.commit("setDependency", { dependencyName, dependency });
 }
 
 /**
@@ -30,7 +34,7 @@ export function sendTranscript(
 ) {
   const { confidenceThreshold } = getters;
 
-  commit("addUserRecord", { line: transcript, confidence });
+  commit("addUserRecord", { line: transcript.toLowerCase(), confidence });
 
   if (confidence < confidenceThreshold) {
     dispatch(
@@ -60,7 +64,7 @@ export function confirm({ dispatch }) {
  * Output
  */
 export function process(context) {
-  const { engagedWith, input, scripts, index, execs } = context.getters;
+  const { engagedWith, input, scripts, dependency, index } = context.getters;
 
   // not engaged
   if (engagedWith == null) {
@@ -77,42 +81,68 @@ export function process(context) {
 
     const { createLine } = skillScript[index];
     const line = createLine(context, input);
-    context.commit("addKellyRecord", { line });
 
-    const exec = execs.get(found);
-    exec(context, line, input);
+    speakUp(context, line);
 
     if (skillScript.length > 1) {
-      console.log(found);
       context.commit("engage", { name: found });
       context.commit("nextIndex");
     }
   } else {
     // engaged
 
-    const skillScript = scripts.get(engagedWith);
-    const { createKeywords, createLine } = skillScript[index];
+    const script = scripts.get(engagedWith);
+    const { useDependencies, createKeywords, createLine, exec } = script[index];
+
+    const dependencies = useDependencies
+      ? useDependencies.reduce((acc, cur) => {
+          acc[cur] = dependency(cur);
+          return acc;
+        }, {})
+      : {};
 
     const keywords = createKeywords(context);
     const trigger = keywords.find((keyword) => input.includes(keyword));
+
+    let line = "";
+    let isRecover = false;
     if (!trigger) {
-      // TODO
-      // ask again
-      console.log("ask again");
-      return;
+      isRecover = true;
+      line = getRecoverLine(script[index], input);
+    } else {
+      line = createLine(context, input, trigger);
     }
 
-    const line = createLine(context, input, trigger);
-    context.commit("addKellyRecord", { line });
+    speakUp(context, line);
 
-    const exec = execs.get(engagedWith);
-    exec(context, line, input);
+    const additionary = {
+      dependencies,
+      line,
+      isRecover,
+      input,
+      trigger,
+    };
 
-    if (index < skillScript.length - 1) {
+    if (exec) exec(context, additionary);
+
+    if (index < script.length - 1) {
+      if (isRecover) return;
       context.commit("nextIndex");
     } else {
       context.commit("disengage");
       context.commit("resetIndex");
     }
+
+    function getRecoverLine(script, input) {
+      const { createRecover } = script;
+      if (!createRecover) return `Sorry, I could not understand ${input}`;
+      return createRecover(context, input);
+    }
+  }
+
+  function speakUp(context, line) {
+    context.dispatch("kelly/mouth/setLine", { line }, { root: true });
+    context.dispatch("kelly/mouth/speak", undefined, { root: true });
+    context.commit("addKellyRecord", { line });
   }
 }

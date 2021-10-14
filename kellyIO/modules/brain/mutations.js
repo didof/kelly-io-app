@@ -42,12 +42,13 @@ export function setHelp(state, { name, help }) {
   state.helps.set(name, help);
 }
 
-export function setExec(state, { name, exec }) {
-  state.execs.set(name, exec);
+export function setScript(state, { name, script }) {
+  state.scripts.set(name, script);
 }
 
-export function setScripts(state, { name, script }) {
-  state.scripts.set(name, script);
+export function setDependency(state, { dependencyName, dependency }) {
+  console.log(dependency)
+  state.dependencies.set(dependencyName, () => dependency);
 }
 
 /**
