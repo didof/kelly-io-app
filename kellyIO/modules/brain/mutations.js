@@ -2,41 +2,61 @@
  * Config
  */
 
-export function learn(state, { skill }) {
-  state.skills.push(skill);
-}
-
 export const setConfidenceThreshold = (state, { confidenceThreshold }) => {
   state.confidenceThreshold = confidenceThreshold;
 };
 
 /**
- * Input
+ * Transcript
  */
 
-export function setActiveSkill(state, { activeSkill }) {
-  state.activeSkill = activeSkill;
+export function addUserRecord(state, { line, confidence }) {
+  state.queue.push({ isKelly: false, line: line.trim(), confidence });
 }
 
-export function addLine(state, { line }) {
-  state.queue.push(line);
+export function addKellyRecord(state, { line }) {
+  state.queue.push({ isKelly: true, line: line.trim() });
 }
 
-export function amendLastLine(state) {
-  state.queue.splice(state.queue.length - 2, 1);
-}
+/**
+ * Index
+ */
 
-export function clearQueue(state) {
-  state.queue = [];
-  state.index = 0
-}
-
-export function nextLine(state) {
+export function nextIndex(state) {
   state.index += 1;
 }
 
-export function reset(state) {
-  state.activeSkill = null
-  state.queue = [];
-  state.index = 0
+export function resetIndex(state) {
+  state.index = 0;
+}
+
+/**
+ * Install
+ */
+
+export function setCommand(state, { name, commands }) {
+  state.commands.set(name, commands);
+}
+
+export function setHelp(state, { name, help }) {
+  state.helps.set(name, help);
+}
+
+export function setExec(state, { name, exec }) {
+  state.execs.set(name, exec);
+}
+
+export function setScripts(state, { name, script }) {
+  state.scripts.set(name, script);
+}
+
+/**
+ * Engage
+ */
+export function engage(state, { name }) {
+  state.engagedWith = name;
+}
+
+export function disengage(state) {
+  state.engagedWith = null;
 }

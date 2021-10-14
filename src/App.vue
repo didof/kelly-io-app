@@ -1,11 +1,12 @@
 <template>
-  <nav>
+  <!-- <nav>
     <ul>
       <li><router-link to="/">Go to Home</router-link></li>
       <li><router-link to="/morsecode">Go to Morsecode</router-link></li>
     </ul>
-  </nav>
+  </nav> -->
 
+  <pre>{{ activeSkill }}</pre>
   <pre>{{ queue }}</pre>
 
   <main>
@@ -13,7 +14,7 @@
     <button @click="handle_stop" :disabled="isStopDisabled">stop</button>
   </main>
 
-  <router-view></router-view>
+  <!-- <router-view></router-view> -->
 
   <KellySpeechConfirmationModal />
 </template>
@@ -33,11 +34,13 @@ export default defineComponent({
     const isStartDisabled = computed(() => !Kgetters["system/isIdle"]);
     const isStopDisabled = computed(() => !Kgetters["system/isRecording"]);
     const queue = computed(() => Kgetters["brain/queue"]);
+    const activeSkill = computed(() => Kgetters["brain/activeSkill"]);
 
     return {
       isStartDisabled,
       isStopDisabled,
       queue,
+      activeSkill,
       handle_start,
       handle_stop,
     };

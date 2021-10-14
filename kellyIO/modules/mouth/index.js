@@ -9,6 +9,7 @@ export default {
       synth: null,
       voices: [],
       line: "",
+      rate: 0.9
     };
   },
   getters,

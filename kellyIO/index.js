@@ -5,14 +5,11 @@ import * as components from "./components";
 
 import { HelpSkill, ConfusionSkill } from "./skills";
 
-const PREFIX = "kelly";
+const DEFAULT_SKILLS = [HelpSkill, ConfusionSkill];
 
 const defaultOptions = {
   confidenceThreshold: 0.5,
-  skills: [
-    new HelpSkill(),
-    new ConfusionSkill()
-  ],
+  skills: () => DEFAULT_SKILLS,
 };
 
 export const KellyIO = {
@@ -28,11 +25,11 @@ export const KellyIO = {
     log("Registering modules into store");
 
     Object.entries(modules).forEach(([name, module]) => {
-      store.registerModule(PREFIX + "/" + name, module);
+      store.registerModule("kelly/" + name, module);
     });
 
     log(`Setting confidence threshold to [${confidenceThreshold}]`);
-    store.dispatch(`${PREFIX}/brain/setConfidenceThreshold`, {
+    store.dispatch("kelly/brain/setConfidenceThreshold", {
       confidenceThreshold,
     });
 
@@ -42,13 +39,13 @@ export const KellyIO = {
     });
 
     log("Learning new skills");
-    skills.forEach((skill) => {
-      store.dispatch(`${PREFIX}/brain/learn`, { skill });
+    skills(DEFAULT_SKILLS).forEach((plugin) => {
+      plugin.install(store);
     });
 
-    log(`Attacching [$${PREFIX}] to Vue instance`);
+    log("Attacching [$kelly] to Vue instance");
     app.config.globalProperties.$kelly = {
-      prefix: PREFIX,
+      prefix: "kelly",
     };
 
     log("Setup completed");
@@ -57,18 +54,18 @@ export const KellyIO = {
 
 export function useKelly(store, { setup = false }) {
   if (setup) {
-    store.dispatch(`${PREFIX}/ears/setup`);
-    store.dispatch(`${PREFIX}/mouth/setup`);
+    store.dispatch(`kelly/ears/setup`);
+    store.dispatch(`kelly/mouth/setup`);
   }
 
   return {
     Kgetters: new Proxy(store.getters, {
       get(target, prop) {
-        return target[`${PREFIX}/${prop}`];
+        return target[`kelly/${prop}`];
       },
     }),
     Kdispatch: function (type, payload, options) {
-      store.dispatch(`${PREFIX}/${type}`, payload, options);
+      store.dispatch(`kelly/${type}`, payload, options);
     },
   };
 }

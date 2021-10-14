@@ -7,11 +7,11 @@ export function setLine(context, payload) {
 }
 
 export function speak(context) {
-  const { line, synth } = context.getters
+  const { line, synth, rate } = context.getters;
 
   var utterance = new SpeechSynthesisUtterance(line);
-  utterance.rate = 1
-  synth.speak(utterance)
+  utterance.rate = rate;
+  synth.speak(utterance);
 
   context.commit("reset");
 }

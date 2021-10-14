@@ -6,13 +6,18 @@ export default {
   namespaced: true,
   state() {
     return {
-      skills: [],
-      activeSkill: null,
-      index: 0,
-
+      // config
       confidenceThreshold: 0.5,
 
-      tmpLine: '',
+      commands: new Map(),
+      helps: new Map(),
+      scripts: new Map(),
+      execs: new Map(),
+
+      engagedWith: null,
+      index: 0,
+
+      // history
       queue: [],
     };
   },

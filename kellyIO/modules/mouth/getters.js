@@ -1,7 +1,3 @@
-export function line({ line }) {
-  return line;
-}
-
-export function synth({ synth }) {
-  return synth;
-}
+export const rate = ({ rate }) => rate
+export const line = ({ line }) => line
+export const synth = ({ synth }) => synth

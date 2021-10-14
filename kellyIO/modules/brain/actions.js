@@ -8,7 +8,17 @@ export function setConfidenceThreshold({ commit }, payload) {
 }
 
 export function learn(context, payload) {
-  context.commit("learn", payload);
+  const { name, exec, script } = payload;
+
+  const commands = payload.commands(context);
+  context.commit("setCommand", { name, commands });
+
+  const help = payload.help(context);
+  context.commit("setHelp", { name, help });
+
+  context.commit("setExec", { name, exec });
+
+  context.commit("setScripts", { name, script });
 }
 
 /**
@@ -20,7 +30,7 @@ export function sendTranscript(
 ) {
   const { confidenceThreshold } = getters;
 
-  commit("addLine", { line: transcript });
+  commit("addUserRecord", { line: transcript, confidence });
 
   if (confidence < confidenceThreshold) {
     dispatch(
@@ -46,66 +56,63 @@ export function confirm({ dispatch }) {
   dispatch("process");
 }
 
-export function incrementLine({ commit }) {
-  commit("incrementLine");
-}
-
 /**
  * Output
  */
 export function process(context) {
-  const { commit, getters } = context;
-  const { noActiveSkill, input, skills, index } = getters;
+  const { engagedWith, input, scripts, index, execs } = context.getters;
 
-  if (noActiveSkill) {
-    const { activeSkill } = pipeline(context, skills, input);
-    commit("nextLine");
+  // not engaged
+  if (engagedWith == null) {
+    const { commands } = context.getters;
 
-    if (isConfused(activeSkill.name)) return;
-    if (isDone(activeSkill.scriptLength, index)) return;
+    let found = null;
+    Array.from(commands.entries()).forEach(([name, commands]) => {
+      if (found) return;
+      if (input.includes(commands)) found = name;
+    });
+    if (!found) found = "confusion";
 
-    commit("setActiveSkill", { activeSkill });
+    const skillScript = scripts.get(found);
+
+    const { createLine } = skillScript[index];
+    const line = createLine(context, input);
+    context.commit("addKellyRecord", { line });
+
+    const exec = execs.get(found);
+    exec(context, line, input);
+
+    if (skillScript.length > 1) {
+      console.log(found);
+      context.commit("engage", { name: found });
+      context.commit("nextIndex");
+    }
   } else {
-    const { activeSkill } = getters;
+    // engaged
 
-    activeSkill.plugin(context, input);
-    commit("nextLine");
+    const skillScript = scripts.get(engagedWith);
+    const { createKeywords, createLine } = skillScript[index];
 
-    if (isDone(activeSkill.scriptLength, index)) return;
-  }
+    const keywords = createKeywords(context);
+    const trigger = keywords.find((keyword) => input.includes(keyword));
+    if (!trigger) {
+      // TODO
+      // ask again
+      console.log("ask again");
+      return;
+    }
 
-  function isConfused(skillName) {
-    if (skillName !== "confusion") return;
-    commit("reset");
-    return true;
-  }
+    const line = createLine(context, input, trigger);
+    context.commit("addKellyRecord", { line });
 
-  function isDone(length, index) {
-    if (index < length - 1) return;
-    commit("reset");
-    return true;
-  }
+    const exec = execs.get(engagedWith);
+    exec(context, line, input);
 
-  function pipeline(context, skills, input) {
-    let exit = false;
-    let activeSkill = null;
-
-    const output = skills.reduce((tmp, skill) => {
-      if (exit) return tmp;
-
-      const res = skill.plugin(context, tmp);
-
-      if (!res) {
-        exit = true;
-        activeSkill = skill;
-      }
-
-      return res;
-    }, input);
-
-    return {
-      activeSkill,
-      output,
-    };
+    if (index < skillScript.length - 1) {
+      context.commit("nextIndex");
+    } else {
+      context.commit("disengage");
+      context.commit("resetIndex");
+    }
   }
 }
