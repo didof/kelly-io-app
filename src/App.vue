@@ -13,7 +13,7 @@
 
   <ClickRecorder />
 
-  <KellySpeechConfirmationModal />
+  <SpeechConfirmationModal />
 </template>
 
 <script>
@@ -22,11 +22,13 @@ import { useStore } from "vuex";
 import { useKelly } from "../kellyIO";
 
 import ClickRecorder from "./components/ClickRecorder.vue";
+import SpeechConfirmationModal from "./components/SpeechConfirmationModal.vue";
 
 export default defineComponent({
   name: "app",
   components: {
     ClickRecorder,
+    SpeechConfirmationModal,
   },
   setup() {
     const store = useStore();

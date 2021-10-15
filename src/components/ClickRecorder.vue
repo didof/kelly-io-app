@@ -8,7 +8,8 @@ import { computed } from "vue";
 import { defineKRecorder } from "../../kellyIO";
 
 export default defineKRecorder({
-  setup({ start, stop, isIdle, isRecording }) {
+  setup({ features }) {
+    const { start, stop, isIdle, isRecording } = features;
     const isStartDisabled = computed(() => !isIdle());
     const isStopDisabled = computed(() => !isRecording());
 

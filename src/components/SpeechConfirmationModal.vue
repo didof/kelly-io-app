@@ -2,7 +2,7 @@
   <teleport to="#app">
     <transition name="fade">
       <div v-if="isOpen">
-        <div class="backdrop" @click="handle_close"></div>
+        <div class="backdrop" @click="close"></div>
         <div class="modal">
           <h1>Confirmation</h1>
           <p>
@@ -10,8 +10,8 @@
           </p>
           <p>Is this right?</p>
           <div class="buttons">
-            <button @click="handle_process">Yes</button>
-            <button @click="handle_close">No</button>
+            <button @click="confirm">Yes</button>
+            <button @click="close">No</button>
           </div>
         </div>
       </div>
@@ -20,37 +20,22 @@
 </template>
 
 <script>
-// TODO use slots to make it composable
-import { defineComponent, computed } from "vue";
-import { useStore } from "vuex";
+import { computed } from "vue";
+import { defineKSpeechConfirmationModal } from "../../kellyIO";
 
-export default defineComponent({
-  name: "kelly-speech-confirmation-modal",
-  setup() {
-    const store = useStore();
+export default defineKSpeechConfirmationModal({
+  setup({ features }) {
+    const { isOpen: isOpenFn, content: contentFn, close, confirm } = features;
 
-    const isOpen = computed(() => {
-      return (
-        store.getters["kelly/modal/isOpen"] &&
-        store.getters["kelly/modal/isSpeechConfirmationType"]
-      );
-    });
-    const content = computed(() => store.getters["kelly/modal/content"]);
+    const isOpen = computed(() => isOpenFn());
+    const content = computed(() => contentFn());
 
     return {
       isOpen,
       content,
-      handle_close,
-      handle_process,
+      close,
+      confirm,
     };
-
-    function handle_close() {
-      store.dispatch("kelly/brain/abort");
-    }
-
-    function handle_process() {
-      store.dispatch("kelly/brain/confirm");
-    }
   },
 });
 </script>

@@ -1,11 +1,11 @@
 import { log } from "./utils";
 
 import * as modules from "./modules";
-import * as components from "./components";
+// import * as components from "./components";
 
 import { HelpSkill, ConfusionSkill, GoToSkill, OpenPageSkill } from "./skills";
 
-import { defineKRecorder } from "./components";
+import { defineKRecorder, defineKSpeechConfirmationModal } from "./components";
 
 const TAIL_SKILLS = [HelpSkill, ConfusionSkill];
 
@@ -35,10 +35,10 @@ export default {
       confidenceThreshold,
     });
 
-    log("Registering components into app");
-    Object.entries(components).forEach(([name, component]) => {
-      app.component(name, component);
-    });
+    // log("Registering components into app");
+    // Object.entries(components).forEach(([name, component]) => {
+    //   app.component(name, component);
+    // });
 
     log("Learning new skills");
     const installPlugin = createPluginInstaller(app);
@@ -89,4 +89,4 @@ export function useKelly(store, options = defaultUseKellyOptions) {
 }
 
 export { GoToSkill, OpenPageSkill };
-export { defineKRecorder };
+export { defineKRecorder, defineKSpeechConfirmationModal };

@@ -1,2 +1,2 @@
-export { default as KellySpeechConfirmationModal } from "./SpeechConfirmationModal";
+export { default as defineKSpeechConfirmationModal } from "./defineKSpeechConfirmationModal";
 export { default as defineKRecorder } from "./defineKRecorder";
