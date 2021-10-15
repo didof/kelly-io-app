@@ -102,7 +102,12 @@ export function process(context) {
       : {};
 
     const keywords = createKeywords(context);
-    const trigger = keywords.find((keyword) => input.includes(keyword));
+    let trigger = "";
+    if (keywords.includes("*")) {
+      trigger = "*";
+    } else {
+      trigger = keywords.find((keyword) => input.includes(keyword));
+    }
 
     let line = "";
     let isRecover = false;

@@ -3,7 +3,7 @@ import { log } from "./utils";
 import * as modules from "./modules";
 import * as components from "./components";
 
-import { HelpSkill, ConfusionSkill, GoToSkill } from "./skills";
+import { HelpSkill, ConfusionSkill, GoToSkill, OpenPageSkill } from "./skills";
 
 import { defineKRecorder } from "./components";
 
@@ -88,5 +88,5 @@ export function useKelly(store, options = defaultUseKellyOptions) {
   };
 }
 
-export { GoToSkill };
+export { GoToSkill, OpenPageSkill };
 export { defineKRecorder };
