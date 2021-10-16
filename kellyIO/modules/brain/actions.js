@@ -64,90 +64,112 @@ export function confirm({ dispatch }) {
  * Output
  */
 export function process(context) {
-  const { engagedWith, input, scripts, dependency, index } = context.getters;
+  if (context.getters.engagedWith == null) processNewCommand(context);
+  else processScriptStep(context);
+}
 
-  // not engaged
-  if (engagedWith == null) {
-    const { commands } = context.getters;
+function processNewCommand(context) {
+  const { commands, input, scripts, index } = context.getters;
 
-    let found = null;
-    Array.from(commands.entries()).forEach(([name, commands]) => {
-      if (found) return;
-      if (input.includes(commands)) found = name;
-    });
-    if (!found) found = "confusion";
+  let found = null;
+  Array.from(commands.entries()).forEach(([name, commands]) => {
+    if (found) return;
+    if (input.includes(commands)) found = name;
+  });
+  if (!found) found = "confusion";
 
-    const skillScript = scripts.get(found);
+  const skillScript = scripts.get(found);
 
-    const { createLine } = skillScript[index];
-    const line = createLine(context, input);
+  const { createLine } = skillScript[index];
+  const line = createLine(context, input);
 
-    speakUp(context, line);
+  speakUp(context, line);
 
-    if (skillScript.length > 1) {
-      context.commit("engage", { name: found });
-      context.commit("nextIndex");
-    }
+  if (skillScript.length > 1) {
+    context.commit("engage", { name: found });
+    context.commit("nextIndex");
+  }
+}
+
+function processScriptStep(context) {
+  const { relevantScriptStep, input, dependency } = context.getters;
+
+  /**
+   * Check input versus keywords
+   */
+  const keywords = relevantScriptStep.createKeywords(context);
+
+  let found = "";
+  if (keywords instanceof RegExp) {
+    found = input.match(keywords);
   } else {
-    // engaged
+    found = keywords.find((keyword) => input.includes(keyword));
+  }
 
-    const script = scripts.get(engagedWith);
-    const { useDependencies, createKeywords, createLine, exec } = script[index];
-
-    const dependencies = useDependencies
-      ? useDependencies.reduce((acc, cur) => {
-          acc[cur] = dependency(cur);
-          return acc;
-        }, {})
-      : {};
-
-    const keywords = createKeywords(context);
-    let trigger = "";
-    if (keywords.includes("*")) {
-      trigger = "*";
-    } else {
-      trigger = keywords.find((keyword) => input.includes(keyword));
-    }
-
-    let line = "";
-    let isRecover = false;
-    if (!trigger) {
-      isRecover = true;
-      line = getRecoverLine(script[index], input);
-    } else {
-      line = createLine(context, input, trigger);
-    }
-
+  /**
+   * If not found, tell recover line and return
+   */
+  if (!found) {
+    const line = getRecoverLine(relevantScriptStep.createRecover, input);
     speakUp(context, line);
+    quit(context);
+    return;
+  }
 
+  /**
+   * If found, check validity of found
+   */
+  if (relevantScriptStep.validateFound) {
+    const output = relevantScriptStep.validateFound(context, found);
+    if (typeof output === "string") {
+      speakUp(context, output);
+      quit(context);
+      return;
+    }
+  }
+
+  if (relevantScriptStep.exec) {
     const additionary = {
-      dependencies,
-      line,
-      isRecover,
       input,
-      trigger,
+      trigger: found,
     };
 
-    if (exec) exec(context, additionary);
-
-    if (index < script.length - 1) {
-      if (isRecover) return;
-      context.commit("nextIndex");
-    } else {
-      context.commit("disengage");
-      context.commit("resetIndex");
+    const { useDependencies } = relevantScriptStep;
+    if (useDependencies) {
+      additionary.dependencies = useDependencies.reduce((acc, cur) => {
+        acc[cur] = dependency(cur);
+        return acc;
+      }, {});
     }
 
-    function getRecoverLine(script, input) {
-      const { createRecover } = script;
-      if (!createRecover) return `Sorry, I could not understand ${input}`;
-      return createRecover(context, input);
-    }
+    relevantScriptStep.exec(context, additionary);
   }
 
-  function speakUp(context, line) {
-    context.dispatch("kelly/mouth/setLine", { line }, { root: true });
-    context.dispatch("kelly/mouth/speak", undefined, { root: true });
-    context.commit("addKellyRecord", { line });
+  /**
+   * Build up response
+   */
+  const line = relevantScriptStep.createLine(context, input, found);
+  speakUp(context, line);
+
+  if (context.getters.isScriptDone) {
+    quit(context);
+  } else {
+    context.commit("nextIndex");
   }
+
+  function getRecoverLine(createRecover, input) {
+    if (!createRecover) return `Sorry, I could not understand ${input}`;
+    return createRecover(context, input);
+  }
+}
+
+function speakUp(context, line) {
+  context.dispatch("kelly/mouth/setLine", { line }, { root: true });
+  context.dispatch("kelly/mouth/speak", undefined, { root: true });
+  context.commit("addKellyRecord", { line });
+}
+
+function quit(context) {
+  context.commit("disengage");
+  context.commit("resetIndex");
 }

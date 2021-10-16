@@ -10,11 +10,18 @@ export default createPlugin({
       createLine: () => "Which?",
     },
     {
-      createKeywords: () => ["*"],
+      createKeywords: () => new RegExp(/.+/),
+      validateFound: (context, found) => {
+        console.log(context, found);
+        return null;
+        // const websiteRegex =
+        //   /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
+
+        // return input.match(websiteRegex);
+      },
       createLine: () => "Oky-doki! Opening page!",
       exec: (context, { input }) => {
-        // TODO logic that recognize if http or https already in, www, etc.
-        window.open(`https://www.${input}`);
+        console.log(context, input);
       },
     },
   ],

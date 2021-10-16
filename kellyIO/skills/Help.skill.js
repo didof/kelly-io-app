@@ -11,11 +11,7 @@ export default createPlugin({
         const skillsNameList =
           context.rootGetters["kelly/brain/skillsNameList"].join(". ");
 
-        return `
-          I know several skills.
-          Here a list of some. ${skillsNameList}.
-          Which one would you like me to explain?
-        `;
+        return `Choose one of the following skills: ${skillsNameList}. Which one would you like me to explain?`;
       },
     },
     {

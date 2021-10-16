@@ -23,3 +23,9 @@ export const dependency =
   ({ dependencies }) =>
   (name) =>
     dependencies.get(name)();
+
+export const relevantScriptStep = ({ engagedWith, scripts, index }) =>
+  scripts.get(engagedWith)[index];
+
+export const isScriptDone = ({ index, engagedWith, scripts }) =>
+  index === scripts.get(engagedWith).length - 1;

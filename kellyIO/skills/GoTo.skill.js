@@ -24,6 +24,7 @@ export default createPlugin({
             Oky-doki! Routing to ${trigger}!
         `,
       exec: (context, { dependencies, trigger }) => {
+        debugger;
         dependencies.router.push({ name: trigger });
       },
     },
